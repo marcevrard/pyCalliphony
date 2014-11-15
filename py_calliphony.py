@@ -4,7 +4,7 @@
 """
 SYNOPSIS
 
-    py_calliphony [-h,--help] [-v,--verbose] [--version]
+    py_calliphony [-h,--help] [-f ]
 
 DESCRIPTION
 
@@ -37,15 +37,22 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
+from scipy.signal import spline_filter
+import argparse as ap
 
-FNAME = 'yves_montand_1_1_coord_.txt'
+# FNAME = 'yves_montand_1_3_coord.txt'
 HEADERS = ('cpu_time', 'position', 'f0')
 FRAME_LEN = 0.005
 
 
 if __name__ == '__main__':
+    argp = ap.ArgumentParser(description=globals()['__doc__'], formatter_class=ap.RawDescriptionHelpFormatter)
+    argp.add_argument('-f', '--fname', required=True, metavar='FILE', help="Coordinate input file")
+    argp.add_argument('-p', '--plot_on', action='store_true', help="Coordinate input file")
+    args = argp.parse_args()
 
-    val_np = np.genfromtxt(FNAME).reshape(-1, 3)
+    # Reshape according to the headers num and all row (-1)
+    val_np = np.genfromtxt(args.fname).reshape(-1, len(HEADERS))
     val_df = pd.DataFrame(val_np, columns=HEADERS)
 
     # Substract the start cpu_time from the time serie; express in s
@@ -53,14 +60,20 @@ if __name__ == '__main__':
     # Insert in the df after the cpu_time column (and express in s from ms)
     val_df.insert(1, 'time', val_time/1000)
 
+    # Smooth time and f0 curves
+    val_df['f0_smooth'] = spline_filter(val_df['f0'])
+
     # Warp f0 values to the original wav file time (from STRAIGHT)
     interp_fct = interp1d(val_df['position'], val_df['f0'], 'linear')
 
-    posit_max = round(val_df['position'].iloc[-1] * 2, 2)/2
-    posit_np = np.arange(0, posit_max, FRAME_LEN)
+    posit_max = round(val_df['position'].iloc[-1] * 2, 2)/2     # round values to 0.005 (0.01/2)
+    posit_np = np.arange(FRAME_LEN, posit_max, FRAME_LEN)   # FIXME 0 > FRAME_LEN, better solution?
     f0_warp = interp_fct(posit_np)
 
-    plt.plot(val_df['time'], val_df['f0'], 'b-', posit_np, f0_warp, 'r-')
-    # val_df.drop('cpu_time', 1).drop('f0', 1).plot()
-    # plt.plot(val_df['time'], val_df['f0'], '.')
-    plt.show()
+    if args.plot_on is True:
+
+        # plt.plot(val_df['time'], val_df['f0'], 'b-', posit_np, f0_warp, 'r-')
+        plt.plot(val_df['time'], val_df['f0'], 'b-', val_df['time'], val_df['f0_smooth'], 'r-')
+        # val_df.drop('cpu_time', 1).drop('f0', 1).plot()
+        # plt.plot(val_df['time'], val_df['f0'], '.')
+        plt.show()
