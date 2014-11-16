@@ -62,7 +62,7 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     except ValueError as msg:
         raise ValueError(msg, "Window_size and order have to be of type int!")
 
-    if window_size%2 != 1 or window_size < 1:
+    if window_size % 2 != 1 or window_size < 1:
         raise TypeError("Window_size size must be a positive odd number!")
     if window_size < order + 2:
         raise TypeError("Window_size is too small for the polynomials order!")

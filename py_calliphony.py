@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     # Warp f0 values to the original wav file time (from STRAIGHT)
     # interp_fct = interpolate.interp1d(val_df['position'], val_df['f0'], 'linear')
-    tck = interpolate.splrep(val_df['position'], f0_smooth)     # , s=0)
+    tck = interpolate.splrep(val_df['position'], f0_smooth, s=10)     # , s=0)
 
     posit_max = round(val_df['position'].iloc[-1] * 2, 2)/2     # round values to 0.005 (0.01/2)
     posit_np = np.arange(FRAME_LEN, posit_max, FRAME_LEN)   # FIXME 0 > FRAME_LEN, better solution?
