@@ -36,9 +36,12 @@ VERSION
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.interpolate import interp1d
-from scipy.signal import spline_filter
+from scipy import interpolate
+# from scipy import signal
+# from scipy.signal import spline_filter
 import argparse as ap
+from savitzki_golay import savitzky_golay
+# import statsmodels.api as sm
 
 # FNAME = 'yves_montand_1_3_coord.txt'
 HEADERS = ('cpu_time', 'position', 'f0')
@@ -61,19 +64,29 @@ if __name__ == '__main__':
     val_df.insert(1, 'time', val_time/1000)
 
     # Smooth time and f0 curves
-    val_df['f0_smooth'] = spline_filter(val_df['f0'])
+    # val_df['f0_smooth'] = spline_filter(val_df['f0'])
+    f0_smooth = savitzky_golay(np.array(val_df['f0']), window_size=21, order=2)
+    # f0_smooth = savitzky_golay(f0_smooth, window_size=31, order=2)
+    # f0_time_lowess = sm.nonparametric.lowess(val_df['f0'], val_df['time'], frac=1/20.)
+
+    # b, a = signal.firwin(64, 0.1, pass_zero=True, window='blackmanharris'), 1.0
+    # b, a = signal.butter(2, 0.1, 'low')
+    # f0_smooth = signal.lfilter(b, a, np.array(val_df['f0']))     # [:, len(b) - 1:]
 
     # Warp f0 values to the original wav file time (from STRAIGHT)
-    interp_fct = interp1d(val_df['position'], val_df['f0'], 'linear')
+    # interp_fct = interpolate.interp1d(val_df['position'], val_df['f0'], 'linear')
+    tck = interpolate.splrep(val_df['position'], f0_smooth)     # , s=0)
 
     posit_max = round(val_df['position'].iloc[-1] * 2, 2)/2     # round values to 0.005 (0.01/2)
     posit_np = np.arange(FRAME_LEN, posit_max, FRAME_LEN)   # FIXME 0 > FRAME_LEN, better solution?
-    f0_warp = interp_fct(posit_np)
+    # f0_warp = interp_fct(posit_np)
+    f0_warp = interpolate.splev(posit_np, tck, der=0)
 
     if args.plot_on is True:
 
-        # plt.plot(val_df['time'], val_df['f0'], 'b-', posit_np, f0_warp, 'r-')
-        plt.plot(val_df['time'], val_df['f0'], 'b-', val_df['time'], val_df['f0_smooth'], 'r-')
+        plt.plot(val_df['time'], val_df['f0'], 'b-', posit_np, f0_warp, 'r-')
+        # plt.plot(val_df['time'], val_df['f0'], 'b.', val_df['time'], f0_smooth, 'r-')
+        # plt.plot(val_df['time'], val_df['f0'], 'b.', val_df['time'], f0_time_lowess[:, 1], 'r-')
         # val_df.drop('cpu_time', 1).drop('f0', 1).plot()
         # plt.plot(val_df['time'], val_df['f0'], '.')
         plt.show()

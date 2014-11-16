@@ -8,11 +8,11 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
 
     Parameters
     ----------
-    y : array_like, shape (N,)
+    y: array_like, shape (N,)
         the values of the time history of the signal.
-    window_size : int
+    window_size: int
         the length of the window. Must be an odd integer number.
-    order : int
+    order: int
         the order of the polynomial used in the filtering.
         Must be less then `window_size` - 1.
     deriv: int
@@ -20,7 +20,7 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
 
     Returns
     -------
-    ys : ndarray, shape (N)
+    ys: ndarray, shape (N)
         the smoothed signal (or it's n-th derivative).
 
     Notes
@@ -45,12 +45,12 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
 
     References
     ----------
-    .. [1] A. Savitzky, M. J. E. Golay, Smoothing and Differentiation of
-       Data by Simplified Least Squares Procedures. Analytical
-       Chemistry, 1964, 36 (8), pp 1627-1639.
-    .. [2] Numerical Recipes 3rd Edition: The Art of Scientific Computing
-       W.H. Press, S.A. Teukolsky, W.T. Vetterling, B.P. Flannery
-       Cambridge University Press ISBN-13: 9780521880688
+    [1] A. Savitzky, M. J. E. Golay, Smoothing and Differentiation of
+        Data by Simplified Least Squares Procedures. Analytical
+        Chemistry, 1964, 36 (8), pp 1627-1639.
+    [2] Numerical Recipes 3rd Edition: The Art of Scientific Computing
+        W.H. Press, S.A. Teukolsky, W.T. Vetterling, B.P. Flannery
+        Cambridge University Press ISBN-13: 9780521880688
     """
 
     import numpy as np
@@ -62,7 +62,7 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     except ValueError as msg:
         raise ValueError(msg, "Window_size and order have to be of type int!")
 
-    if window_size % 2 != 1 or window_size < 1:
+    if window_size%2 != 1 or window_size < 1:
         raise TypeError("Window_size size must be a positive odd number!")
     if window_size < order + 2:
         raise TypeError("Window_size is too small for the polynomials order!")
@@ -80,4 +80,4 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     lastvals = y[-1] + np.abs(y[-half_window-1:-1][::-1] - y[-1])
     y = np.concatenate((firstvals, y, lastvals))
 
-    return np.convolve( m[::-1], y, mode='valid')
+    return np.convolve(m[::-1], y, mode='valid')
