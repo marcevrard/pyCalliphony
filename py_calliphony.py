@@ -39,6 +39,7 @@ import matplotlib.pyplot as plt
 from scipy import interpolate
 import argparse as ap
 from savitzki_golay import savitzky_golay
+import os.path
 
 # FNAME = 'yves_montand_1_3_coord.txt'
 HEADERS = ('cpu_time', 'position', 'f0')
@@ -47,8 +48,9 @@ FRAME_LEN = 0.005
 
 if __name__ == '__main__':
     argp = ap.ArgumentParser(description=globals()['__doc__'], formatter_class=ap.RawDescriptionHelpFormatter)
-    argp.add_argument('-f', '--fname', required=True, metavar='FILE', help="Coordinate input file")
-    argp.add_argument('-p', '--plot_on', action='store_true', help="Coordinate input file")
+    argp.add_argument('-f', '--fname', required=True, metavar='FILE', help="Coordinate input file name")
+    argp.add_argument('-p', '--plot_on', action='store_true', help="Turn on the plotting")
+    argp.add_argument('-w', '--write_to_files', action='store_true', help="Coordinate input file")
     args = argp.parse_args()
 
     # Reshape according to the headers num and all row (-1)
@@ -76,3 +78,12 @@ if __name__ == '__main__':
 
         plt.plot(val_df['time'], val_df['f0'], 'b-', posit_np, f0_warp, 'r-')
         plt.show()
+
+    if args.write_to_files is True:
+
+        fbase = os.path.splitext(args.fname)[0]
+        with open(fbase+'.newf0', 'w') as f_newf0:
+            f0_warp.astype('float32').tofile(f_newf0)
+        with open(fbase+'.newtime', 'w') as f_newtime:
+            # noinspection PyTypeChecker
+            np.array(val_df['time'], dtype='float32').tofile(f_newtime)
