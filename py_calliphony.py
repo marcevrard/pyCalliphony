@@ -85,5 +85,4 @@ if __name__ == '__main__':
         with open(fbase+'.newf0', 'w') as f_newf0:
             f0_warp.astype('float32').tofile(f_newf0)
         with open(fbase+'.newtime', 'w') as f_newtime:
-            # noinspection PyTypeChecker
-            np.array(val_df['time'], dtype='float32').tofile(f_newtime)
+            val_df['time'].values.astype('float32').tofile(f_newtime)
