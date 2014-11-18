@@ -74,18 +74,22 @@ if __name__ == '__main__':
     f0_warp = interpolate.splev(posit_np, tck, der=0) * 1.5     # FIXME TEMP!!!
 
     # Interpolate the time array to a STRAIGHT time mapping format (imap = 1 : 1/frame_points : num_frames;)
-    time_idx_np = np.arange(0, len(coord_df['time']))
-    map_idx_np = np.arange(0, len(coord_df['time'])-1, step=1/frame_points)
-    interp_time_fct = interpolate.interp1d(time_idx_np, coord_df['time'], 'linear')
-    time_map_np = interp_time_fct(map_idx_np)
-    imap_np = time_map_np / posit_max * len(coord_df['time'])       # normalize max value to the total number of frames
+    num_frames = len(coord_df['time_smooth'])
+    time_max = coord_df['time_smooth'].max()
+    imap_idx_np = np.arange(start=1/frame_points, stop=num_frames-1, step=1/frame_points)
+    imap_time_np = imap_idx_np / (num_frames-1) * time_max
+    interp_time_fct = interpolate.interp1d(coord_df['time_smooth'], coord_df['pos_smooth'], 'linear')
+    time_map_np = interp_time_fct(imap_time_np)
+    imap_np = time_map_np / time_max * num_frames                      # normalize max value to total number of frames
 
     if args.plot_on is True:
 
-        plt.plot(coord_df['time'], coord_df['f0'])
-        plt.plot(posit_np, f0_warp)
+        # plt.plot(coord_df['time'], coord_df['f0'])
+        # plt.plot(posit_np, f0_warp)
         # plt.plot(coord_df['time'], coord_df['position'])
         # plt.plot(coord_df['time_smooth'], coord_df['pos_smooth'])
+        plt.plot(coord_df['time_smooth'], coord_df['pos_smooth'], '.')
+        plt.plot(imap_time_np, imap_np, '.')
         plt.show()
 
     if args.write_to_files is True:
