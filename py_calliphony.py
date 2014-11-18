@@ -41,9 +41,10 @@ import argparse as ap
 from savitzki_golay import savitzky_golay
 import os.path
 
-# FNAME = 'yves_montand_1_3_coord.txt'
 HEADERS = ('cpu_time', 'position', 'f0')
-FRAME_LEN = 0.005
+FRAME_DUR = 0.005
+FS = 48000
+frame_points = int(round(FRAME_DUR*FS))
 
 
 if __name__ == '__main__':
@@ -54,29 +55,37 @@ if __name__ == '__main__':
     args = argp.parse_args()
 
     # Reshape according to the headers num and all row (-1)
-    val_np = np.genfromtxt(args.fname).reshape(-1, len(HEADERS))
-    val_df = pd.DataFrame(val_np, columns=HEADERS)
+    coord_np = np.genfromtxt(args.fname).reshape(-1, len(HEADERS))
+    coord_df = pd.DataFrame(coord_np, columns=HEADERS)
 
-    # Substract the start cpu_time from the time serie; express in s
-    val_time = val_df['cpu_time'] - val_df.iloc[0]['cpu_time']
-    # Insert in the df after the cpu_time column (and express in s from ms)
-    val_df.insert(1, 'time', val_time/1000)
+    # Extract relative time from CPU time
+    coord_time = coord_df['cpu_time'] - coord_df.iloc[0]['cpu_time']
+    coord_df.insert(1, 'time', coord_time/1000)     # Insert in df after cpu_time column (and express in s (from ms))
 
     # Smooth time and f0 curves
-    f0_smooth = savitzky_golay(np.array(val_df['f0']), window_size=21, order=2)
+    coord_df['time_smooth'] = savitzky_golay(np.array(coord_df['time']), window_size=21, order=2)
+    coord_df['pos_smooth'] = savitzky_golay(np.array(coord_df['position']), window_size=21, order=2)
+    coord_df['f0_smooth'] = savitzky_golay(np.array(coord_df['f0']), window_size=21, order=2)
 
     # Warp f0 values to the original wav file time (from STRAIGHT)
-    # interp_fct = interpolate.interp1d(val_df['position'], val_df['f0'], 'linear')
-    tck = interpolate.splrep(val_df['position'], f0_smooth, s=10)     # , s=0)
+    posit_max = round(coord_df['pos_smooth'].iloc[-1] * 2, 2)/2   # round values to 0.005 (0.01/2)
+    posit_np = np.arange(start=FRAME_DUR, stop=posit_max, step=FRAME_DUR)   # TODO 0 > FRAME_LEN, better solution?
+    tck = interpolate.splrep(coord_df['pos_smooth'], coord_df['f0_smooth'], s=5)    # , s=10)
+    f0_warp = interpolate.splev(posit_np, tck, der=0) * 1.5     # FIXME TEMP!!!
 
-    posit_max = round(val_df['position'].iloc[-1] * 2, 2)/2     # round values to 0.005 (0.01/2)
-    posit_np = np.arange(FRAME_LEN, posit_max, FRAME_LEN)   # FIXME 0 > FRAME_LEN, better solution?
-    # f0_warp = interp_fct(posit_np)
-    f0_warp = interpolate.splev(posit_np, tck, der=0)
+    # Interpolate the time array to a STRAIGHT time mapping format (imap = 1 : 1/frame_points : num_frames;)
+    time_idx_np = np.arange(0, len(coord_df['time']))
+    map_idx_np = np.arange(0, len(coord_df['time'])-1, step=1/frame_points)
+    interp_time_fct = interpolate.interp1d(time_idx_np, coord_df['time'], 'linear')
+    time_map_np = interp_time_fct(map_idx_np)
+    imap_np = time_map_np / posit_max * len(coord_df['time'])       # normalize max value to the total number of frames
 
     if args.plot_on is True:
 
-        plt.plot(val_df['time'], val_df['f0'], 'b-', posit_np, f0_warp, 'r-')
+        plt.plot(coord_df['time'], coord_df['f0'])
+        plt.plot(posit_np, f0_warp)
+        # plt.plot(coord_df['time'], coord_df['position'])
+        # plt.plot(coord_df['time_smooth'], coord_df['pos_smooth'])
         plt.show()
 
     if args.write_to_files is True:
@@ -84,5 +93,5 @@ if __name__ == '__main__':
         fbase = os.path.splitext(args.fname)[0]
         with open(fbase+'.newf0', 'w') as f_newf0:
             f0_warp.astype('float32').tofile(f_newf0)
-        with open(fbase+'.newtime', 'w') as f_newtime:
-            val_df['time'].values.astype('float32').tofile(f_newtime)
+        with open(fbase+'.newpos', 'w') as f_newpos:
+            imap_np.astype('float32').tofile(f_newpos)
