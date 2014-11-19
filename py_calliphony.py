@@ -71,7 +71,7 @@ if __name__ == '__main__':
     posit_max = round(coord_df['pos_smooth'].iloc[-1] * 2, 2)/2   # round values to 0.005 (0.01/2)
     posit_np = np.arange(start=FRAME_DUR, stop=posit_max, step=FRAME_DUR)   # TODO 0 > FRAME_LEN, better solution?
     tck = interpolate.splrep(coord_df['pos_smooth'], coord_df['f0_smooth'], s=5)    # , s=10)
-    f0_warp = interpolate.splev(posit_np, tck, der=0) * 1.5     # FIXME TEMP!!!
+    f0_warp = interpolate.splev(posit_np, tck, der=0)
 
     # Interpolate the time array to a STRAIGHT time mapping format (imap = 1 : 1/frame_points : num_frames;)
     num_frames = len(coord_df['time_smooth'])
@@ -88,8 +88,7 @@ if __name__ == '__main__':
         # plt.plot(posit_np, f0_warp)
         # plt.plot(coord_df['time'], coord_df['position'])
         # plt.plot(coord_df['time_smooth'], coord_df['pos_smooth'])
-        plt.plot(coord_df['time_smooth'], coord_df['pos_smooth'], '.')
-        plt.plot(imap_time_np, imap_np, '.')
+        plt.plot(imap_time_np, imap_np)
         plt.show()
 
     if args.write_to_files is True:
