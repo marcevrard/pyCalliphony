@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 """
 SYNOPSIS
@@ -67,11 +67,14 @@ if __name__ == '__main__':
     coord_df['pos_smooth'] = savitzky_golay(np.array(coord_df['position']), window_size=21, order=2)
     coord_df['f0_smooth'] = savitzky_golay(np.array(coord_df['f0']), window_size=21, order=2)
 
-    # Warp f0 values to the original wav file time (from STRAIGHT)
-    posit_max = round(coord_df['pos_smooth'].iloc[-1] * 2, 2)/2   # round values to 0.005 (0.01/2)
-    posit_np = np.arange(start=FRAME_DUR, stop=posit_max, step=FRAME_DUR)   # TODO 0 > FRAME_LEN, better solution?
-    tck = interpolate.splrep(coord_df['pos_smooth'], coord_df['f0_smooth'], s=5)    # , s=10)
-    f0_warp = interpolate.splev(posit_np, tck, der=0)
+    # # Warp f0 values to the original wav file time (from STRAIGHT)
+    # posit_max = round(coord_df['pos_smooth'].iloc[-1] * 2, 2)/2   # round values to 0.005 (0.01/2)
+    # posit_np = np.arange(start=FRAME_DUR, stop=posit_max, step=FRAME_DUR)   # TODO 0 > FRAME_LEN, better solution?
+    # tck = interpolate.splrep(coord_df['pos_smooth'], coord_df['f0_smooth'], s=5)    # , s=10)
+    # f0_warp = interpolate.splev(posit_np, tck, der=0)
+
+    # f0_warp = coord_df['f0_smooth'].values      # DEBUG**
+    # posit_np = coord_df['time'] #coord_df['f0_smooth'].values      # DEBUG**
 
     # Interpolate the time array to a STRAIGHT time mapping format (imap = 1 : 1/frame_points : num_frames;)
     num_frames = len(coord_df['time_smooth'])
@@ -79,22 +82,27 @@ if __name__ == '__main__':
     imap_idx_np = np.arange(start=1/frame_points, stop=num_frames-1, step=1/frame_points)
     imap_time_np = imap_idx_np / (num_frames-1) * time_max
     interp_time_fct = interpolate.interp1d(coord_df['time_smooth'], coord_df['pos_smooth'], 'linear')
-    time_map_np = interp_time_fct(imap_time_np)
-    imap_np = time_map_np / time_max * num_frames                      # normalize max value to total number of frames
+    time_map_np = np.array(interp_time_fct(imap_time_np))
+    imap_np = time_map_np * num_frames / time_max                      # normalize max value to total number of frames
+
+    # Interpol f0 values to the final wav file time (from STRAIGHT) DEBUG TEST!!**
+    time_rnd_max = round(time_max * 2, 2)/2   # round values to 0.005 (0.01/2)
+    time_np = np.arange(start=FRAME_DUR, stop=time_rnd_max, step=FRAME_DUR)   # TODO 0 > FRAME_LEN, better solution?
+    tck = interpolate.splrep(coord_df['time_smooth'], coord_df['f0_smooth'], s=50)    # , s=10)
+    f0_interp = interpolate.splev(time_np, tck, der=0)
 
     if args.plot_on is True:
 
-        # plt.plot(coord_df['time'], coord_df['f0'])
-        # plt.plot(posit_np, f0_warp)
-        # plt.plot(coord_df['time'], coord_df['position'])
-        # plt.plot(coord_df['time_smooth'], coord_df['pos_smooth'])
-        plt.plot(imap_time_np, imap_np)
+        # plt.plot(coord_df['time'], coord_df['f0'], posit_np, f0_warp)
+        plt.plot(coord_df['time'], coord_df['f0'], time_np, f0_interp)
+        # plt.plot(coord_df['time'], coord_df['position'], coord_df['time_smooth'], coord_df['pos_smooth'])
+        # plt.plot(imap_time_np, imap_np)
         plt.show()
 
     if args.write_to_files is True:
 
         fbase = os.path.splitext(args.fname)[0]
         with open(fbase+'.newf0', 'w') as f_newf0:
-            f0_warp.astype('float32').tofile(f_newf0)
+            f0_interp.astype('float32').tofile(f_newf0)     # f0_warp DEBUG
         with open(fbase+'.newpos', 'w') as f_newpos:
             imap_np.astype('float32').tofile(f_newpos)
