@@ -106,11 +106,13 @@ if __name__ == '__main__':
         ax_arr[1].plot(posit, f0_warp)
         ax_arr[1].legend(['f0_warp'], loc='best')
 
-        f2, ax2 = plt.subplots(111)
-        ax2.legend(['imap'], loc='best')
+        # f2, ax2 = plt.subplots(111)
+        # ax2[0].plot(imap)
+        # ax2.plot(imap)
+        # ax2.legend(['imap'], loc='best')
 
         f1.show()
-        f2.show()
+        # f2.show()
 
     if args.write_to_files is True:
 
