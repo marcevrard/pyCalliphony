@@ -4,21 +4,19 @@
 """
 SYNOPSIS
 
-    py_calliphony [-h,--help] [-f ]
+    py_calliphony [-h,--help] -f fpath [-p] [-w]
 
 DESCRIPTION
 
-    **TODO** This describes how to use this script. This docstring
-        will be printed by the script if there is an error or
-        if the user requests help (-h or --help).
+    **TODO**
 
 EXAMPLES
 
-    %run /Volumes/Python/pyCalliphony/py_calliphony.py -f limsi_fr_tat_0002_perf_01.txt -w
+    %run /Volumes/Python/pyCalliphony/py_calliphony.py -f limsi_fr_tat_0002_perf_01.txt -w -p
 
 EXIT STATUS
 
-    **TODO** List exit codes
+    **TODO**
 
 AUTHORS
 
@@ -26,7 +24,7 @@ AUTHORS
 
 LICENSE
 
-    This script is in the public domain, free from copyrights or restrictions.
+    **TODO**
 
 VERSION
 
