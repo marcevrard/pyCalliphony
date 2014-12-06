@@ -14,7 +14,7 @@ DESCRIPTION
 
 EXAMPLES
 
-    %run /Volumes/Python/pyCalliphony/py_calliphony.py
+    %run /Volumes/Python/pyCalliphony/py_calliphony.py -f limsi_fr_tat_0002_perf_01.txt -w
 
 EXIT STATUS
 
@@ -105,14 +105,12 @@ if __name__ == '__main__':
         ax_arr[0].legend(['f0'], loc='best')
         ax_arr[1].plot(posit, f0_warp)
         ax_arr[1].legend(['f0_warp'], loc='best')
-
-        # f2, ax2 = plt.subplots(111)
-        # ax2[0].plot(imap)
-        # ax2.plot(imap)
-        # ax2.legend(['imap'], loc='best')
-
         f1.show()
-        # f2.show()
+
+        plt.figure(2)
+        plt.plot(imap)
+        plt.legend(['imap'], loc='best')
+        plt.show()
 
     if args.write_to_files is True:
 
