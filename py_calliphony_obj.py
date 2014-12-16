@@ -42,7 +42,7 @@ import os.path
 HEADERS = ('cpu_time', 'position', 'f0')
 FRAME_DUR = 0.005
 FS = 48000
-frame_points = int(round(FRAME_DUR*FS))
+FRAME_PTS = int(round(FRAME_DUR*FS))
 
 
 class CalliStraightConv:
@@ -98,14 +98,14 @@ class CalliStraightConv:
     def interp_time(self):
         """
         Interpolate the time array to a STRAIGHT time mapping format
-        (imap = 1 : 1/(frame_points) : num_frames;)
+        (imap = 1 : 1/(FRAME_PTS) : num_frames;)
         """
         # noinspection PyTypeChecker
         num_frames = len(self.f0_orig_arr)
         time_max = self.coord_df['time_smooth'].max()
         pos_max = self.coord_df['pos_smooth'].max()
 
-        target_frame_points_avg = round(frame_points * (time_max/pos_max))
+        target_frame_points_avg = round(FRAME_PTS * (time_max/pos_max))
         imap_idx = np.arange(start=1, stop=num_frames, step=1/target_frame_points_avg)
         imap_time = imap_idx / num_frames * time_max
 
@@ -119,8 +119,11 @@ class CalliStraightConv:
         with open(self.fbase_path+'.newpos', 'w') as f_newpos:
             self.imap_arr.astype('float32').tofile(f_newpos)
 
+# ==================================================================================================================== #
     def process_conv(self):
-        """Process the complete conversion"""
+        """
+        Process the complete conversion
+        """
         self.import_f0()
         self.extract_time()
         self.smooth_curves()    # optional DEBUG
@@ -128,6 +131,7 @@ class CalliStraightConv:
         self.set_unvoiced_f0()
         self.interp_time()
 
+# ==================================================================================================================== #
     def plot_f0(self):
         # print('f0_uv_idx:', f0_uv_idx)
         plt.plot(self.f0_orig_arr)
