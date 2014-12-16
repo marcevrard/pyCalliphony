@@ -16,7 +16,7 @@ do
     basename=${fname%_perf_*}    # Trim the shortest match from _perf to the end (www.tldp.org/LDP/LG/issue18/bash.html)
     baseperf=${fname%.*}
     perf_id=${baseperf#*_perf_}
-    python3 ${THISDIR}/py_calliphony.py -f ${basename}_perf_${perf_id}.txt -w
+    python3 ${THISDIR}/py_calliphony_obj.py -f ${basename}_perf_${perf_id}.txt -w
 
     cd ${STRAIGHT}
     ${MATLAB} -nodisplay -nosplash -nojvm -r "RUN_synth_fct ${basename} _perf_${perf_id}; exit" >/dev/null

@@ -31,7 +31,6 @@ VERSION
     $Id$
 """
 
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -39,7 +38,6 @@ from scipy import interpolate
 import argparse as ap
 from savitzki_golay import savitzky_golay
 import os.path
-
 
 HEADERS = ('cpu_time', 'position', 'f0')
 FRAME_DUR = 0.005
