@@ -12,7 +12,7 @@ DESCRIPTION
 
 EXAMPLES
 
-    %run /Volumes/Python/pyCalliphony/py_calliphony.py -f limsi_fr_tat_0002_perf_01.txt -w -p
+    %run /Volumes/Python/pyCalliphony/py_calliphony_obj.py -f limsi_fr_tat_0002_perf_01.txt -w -p
 
 EXIT STATUS
 
@@ -151,37 +151,32 @@ class CalliStraightConv:
 
 # ==================================================================================================================== #
     def plot_f0(self):
-        # print('f0_uv_idx:', f0_uv_idx)
+        plt.figure()
         plt.plot(self.f0_orig_arr)
         plt.legend(['f0_orig_np'], loc='best')
-        plt.show()
 
     def plot_time(self):
+        plt.figure()
         plt.plot(self.coord_df['time'])
         plt.plot(self.coord_df['position'])
         plt.legend(['time', 'position'], loc='best')
-        plt.show()
 
     def plot_smoothed_curves(self):
-        # plt.plot(coord_df['time'], coord_df['position'], coord_df['time_smooth'], coord_df['pos_smooth'])
-        # plt.legend(['position', 'position_smooth'], loc='best')
+        plt.figure()
         plt.plot(self.coord_df['time'], self.coord_df['f0'], self.coord_df['time_smooth'], self.coord_df['f0_smooth'])
         plt.legend(['f0', 'f0_smooth'], loc='best')
-        plt.show()
 
     def plot_warped_f0(self):
-        ax_arr = plt.subplots(2, sharey=True)
-        ax_arr[0].plot(self.coord_df['time'], self.coord_df['f0'])
-        ax_arr[0].legend(['f0'], loc='best')
-        ax_arr[1].plot(self.posit_arr, self.f0_warp_arr)
-        ax_arr[1].legend(['f0_warp'], loc='best')
-        plt.show()
+        f, axs = plt.subplots(2, sharey=True)
+        axs[0].plot(self.coord_df['time'], self.coord_df['f0'])
+        axs[0].legend(['f0'], loc='best')
+        axs[1].plot(self.posit_arr, self.f0_warp_arr)
+        axs[1].legend(['f0_warp'], loc='best')
 
     def plot_interp_time(self):
-        plt.figure(2)
+        plt.figure()
         plt.plot(self.imap_arr)
         plt.legend(['imap'], loc='best')
-        plt.show()
 
 if __name__ == '__main__':
 
@@ -202,6 +197,7 @@ if __name__ == '__main__':
         calli_straight_conv_obj.write_to_files()
 
     if args.plot_on is True:
-
+        calli_straight_conv_obj.plot_smoothed_curves()
         calli_straight_conv_obj.plot_warped_f0()
         calli_straight_conv_obj.plot_interp_time()
+        plt.show()
