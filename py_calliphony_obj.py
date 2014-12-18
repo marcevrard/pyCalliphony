@@ -77,7 +77,7 @@ class CalliStraightConv:
 
     def extract_time_position(self):
         """Get the position of the time pointer from the sample values"""
-        self.coord_df.insert(1, 'position', self.coord_df['sample_pos']/FS)
+        self.coord_df.insert(1, 'position', self.coord_df['sample_pos'] / self.fs)
 
     def import_f0(self):
         """Import f0 from STRAIGHT"""
