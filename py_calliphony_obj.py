@@ -52,11 +52,13 @@ class CalliStraightConv:
     def __init__(self, coord_fpath):
         """Import and format in DataFrame the raw input coordinated"""
         self.coord_fpath = coord_fpath
+
+        # Get generic paths from coordinate file path
         self.main_path, self.coord_fname = os.path.split(coord_fpath)
         self.fbase_path = os.path.splitext(coord_fpath)[0]
-        # Reshape according to the headers num and all row (-1)
-        self.coord_arr = np.genfromtxt(coord_fpath).reshape(-1, len(HEADERS))
-        self.coord_df = pd.DataFrame(self.coord_arr, columns=HEADERS)
+
+        self.coord_arr = np.array([])
+        self.coord_df = pd.DataFrame()
 
         self.f0_orig_arr = np.array([])
         self.f0_uv_idx = np.array([])
@@ -64,12 +66,18 @@ class CalliStraightConv:
         self.posit_arr = np.array([])
         self.imap_arr = np.array([])
 
+    def import_coord_text(self):
+        """Import Calliphony coordinates from text Max object as DataFrame"""
+        # Reshape according to the headers num and all row (-1)
+        self.coord_arr = np.genfromtxt(self.coord_fpath).reshape(-1, len(HEADERS))
+        self.coord_df = pd.DataFrame(self.coord_arr, columns=HEADERS)
+
     def import_f0(self):
         """Import f0 from STRAIGHT"""
         f0_fpath = os.path.join(self.main_path, '_'.join(self.coord_fname.split('_')[:4]) + '.f0')
         # noinspection PyNoneFunctionAssignment
         self.f0_orig_arr = np.fromfile(f0_fpath, dtype='f4')
-        self.f0_uv_idx = np.where(self.f0_orig_arr == 0)[0]  # Unvoiced indexes
+        self.f0_uv_idx = np.where(self.f0_orig_arr == 0)[0]     # Unvoiced indexes
 
     def extract_time(self):
         """Extract relative time from CPU time"""
@@ -124,6 +132,7 @@ class CalliStraightConv:
         """
         Process the complete conversion
         """
+        self.import_coord_text()
         self.import_f0()
         self.extract_time()
         self.smooth_curves()    # optional DEBUG
@@ -176,10 +185,10 @@ if __name__ == '__main__':
 
     calli_straight_conv_obj.process_conv()
 
+    if args.write_to_files is True:
+        calli_straight_conv_obj.write_to_files()
+
     if args.plot_on is True:
 
         calli_straight_conv_obj.plot_warped_f0()
         calli_straight_conv_obj.plot_interp_time()
-
-    if args.write_to_files is True:
-        calli_straight_conv_obj.write_to_files()
