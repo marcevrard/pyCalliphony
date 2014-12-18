@@ -39,19 +39,22 @@ import argparse as ap
 from savitzki_golay import savitzky_golay
 import os.path
 
-HEADERS = ('cpu_time', 'position', 'f0')
-FRAME_DUR = 0.005
-FS = 48000
-FRAME_PTS = int(round(FRAME_DUR*FS))
+
+HEADERS = ('cpu_time', 'sample_pos', 'f0')
 
 
 class CalliStraightConv:
     """
     Class to convert calliphony tablette coordinates to straight
     """
-    def __init__(self, coord_fpath):
+    def __init__(self, coord_fpath, headers, fs, frame_dur):
         """Import and format in DataFrame the raw input coordinated"""
         self.coord_fpath = coord_fpath
+        self.headers = headers
+        self.fs = fs
+        self.frame_dur = frame_dur
+
+        self.frame_pts = int(round(self.frame_dur * self.fs))
 
         # Get generic paths from coordinate file path
         self.main_path, self.coord_fname = os.path.split(coord_fpath)
@@ -69,8 +72,12 @@ class CalliStraightConv:
     def import_coord_text(self):
         """Import Calliphony coordinates from text Max object as DataFrame"""
         # Reshape according to the headers num and all row (-1)
-        self.coord_arr = np.genfromtxt(self.coord_fpath).reshape(-1, len(HEADERS))
-        self.coord_df = pd.DataFrame(self.coord_arr, columns=HEADERS)
+        self.coord_arr = np.genfromtxt(self.coord_fpath).reshape(-1, len(self.headers))
+        self.coord_df = pd.DataFrame(self.coord_arr, columns=self.headers)
+
+    def extract_time_position(self):
+        """Get the position of the time pointer from the sample values"""
+        self.coord_df.insert(1, 'position', self.coord_df['sample_pos']/FS)
 
     def import_f0(self):
         """Import f0 from STRAIGHT"""
@@ -106,14 +113,14 @@ class CalliStraightConv:
     def interp_time(self):
         """
         Interpolate the time array to a STRAIGHT time mapping format
-        (imap = 1 : 1/(FRAME_PTS) : num_frames;)
+        (imap = 1 : 1/(self.frame_pts) : num_frames;)
         """
         # noinspection PyTypeChecker
         num_frames = len(self.f0_orig_arr)
         time_max = self.coord_df['time_smooth'].max()
         pos_max = self.coord_df['pos_smooth'].max()
 
-        target_frame_points_avg = round(FRAME_PTS * (time_max/pos_max))
+        target_frame_points_avg = round(self.frame_pts * (time_max/pos_max))
         imap_idx = np.arange(start=1, stop=num_frames, step=1/target_frame_points_avg)
         imap_time = imap_idx / num_frames * time_max
 
@@ -133,6 +140,7 @@ class CalliStraightConv:
         Process the complete conversion
         """
         self.import_coord_text()
+        self.extract_time_position()
         self.import_f0()
         self.extract_time()
         self.smooth_curves()    # optional DEBUG
@@ -161,12 +169,12 @@ class CalliStraightConv:
         plt.show()
 
     def plot_warped_f0(self):
-        f1, ax_arr = plt.subplots(2, sharey=True)
+        ax_arr = plt.subplots(2, sharey=True)
         ax_arr[0].plot(self.coord_df['time'], self.coord_df['f0'])
         ax_arr[0].legend(['f0'], loc='best')
         ax_arr[1].plot(self.posit_arr, self.f0_warp_arr)
         ax_arr[1].legend(['f0_warp'], loc='best')
-        f1.show()
+        plt.show()
 
     def plot_interp_time(self):
         plt.figure(2)
@@ -175,13 +183,17 @@ class CalliStraightConv:
         plt.show()
 
 if __name__ == '__main__':
+
+    FS = 48000
+    FRAME_DUR = 0.005
+
     argp = ap.ArgumentParser(description=globals()['__doc__'], formatter_class=ap.RawDescriptionHelpFormatter)
     argp.add_argument('-f', '--fpath', required=True, metavar='FILE', help="Coordinate input file name")
     argp.add_argument('-p', '--plot_on', action='store_true', help="Turn on the plotting")
     argp.add_argument('-w', '--write_to_files', action='store_true', help="Coordinate input file")
     args = argp.parse_args()
 
-    calli_straight_conv_obj = CalliStraightConv(args.fpath)
+    calli_straight_conv_obj = CalliStraightConv(args.fpath, HEADERS, FS, FRAME_DUR)
 
     calli_straight_conv_obj.process_conv()
 
