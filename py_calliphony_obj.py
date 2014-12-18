@@ -101,7 +101,8 @@ class CalliStraightConv:
     def warp_f0(self):
         """Warp f0 values to the original wav file time (from STRAIGHT)"""
         posit_max = round(self.coord_df['pos_smooth'].iloc[-1] * 2, 2)/2     # round values to 0.005 (0.01/2)
-        self.posit_arr = np.arange(start=FRAME_DUR, stop=posit_max, step=FRAME_DUR)  # TODO 0 > FRAME_LEN, better solut?
+        # TODO 0 > self.frame_dur, better solution?
+        self.posit_arr = np.arange(start=self.frame_dur, stop=posit_max, step=self.frame_dur)
         tck = interpolate.splrep(self.coord_df['pos_smooth'], self.coord_df['f0_smooth'], s=5)    # , s=10)
         self.f0_warp_arr = interpolate.splev(self.posit_arr, tck, der=0)
 
