@@ -109,7 +109,7 @@ class CalliStraightConv:
     def set_unvoiced_f0(self):
         """Set zeros to unvoiced sections"""
         self.f0_uv_idx = [el for el in self.f0_uv_idx if el < len(self.f0_warp_arr)]
-        self.f0_warp_arr[self.f0_uv_idx] = 0
+        self.f0_warp_arr[self.f0_uv_idx] = 0       # Correction added to account for the skipped samples in Calli.)
 
     def interp_time(self):
         """
