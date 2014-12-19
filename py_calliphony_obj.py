@@ -140,14 +140,17 @@ class CalliStraightConv:
         """
         Process the complete conversion
         """
-        self.import_coord_text()
-        self.extract_time_position()
-        self.import_f0()
-        self.extract_time()
-        self.smooth_curves()    # optional DEBUG
-        self.warp_f0()
-        self.set_unvoiced_f0()
-        self.interp_time()
+        try:
+            self.import_coord_text()
+            self.extract_time_position()
+            self.import_f0()
+            self.extract_time()
+            self.smooth_curves()    # optional DEBUG
+            self.warp_f0()
+            self.set_unvoiced_f0()
+            self.interp_time()
+        except IndexError:
+            print('Import error, the input file is probably empty!')
 
 # ==================================================================================================================== #
     def plot_f0(self):
