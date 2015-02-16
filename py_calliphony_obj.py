@@ -45,7 +45,7 @@ HEADERS = ('cpu_time', 'sample_pos', 'f0')
 
 class CalliStraightConv:
     """
-    Class to convert calliphony tablette coordinates to straight
+    Class to convert calliphony tablet coordinates to straight
     """
     def __init__(self, coord_fpath, headers, fs, frame_dur):
         """Import and format in DataFrame the raw input coordinated"""
@@ -135,7 +135,7 @@ class CalliStraightConv:
         with open(self.fbase_path+'.newpos', 'w') as f_newpos:
             self.imap_arr.astype('float32').tofile(f_newpos)
 
-# ==================================================================================================================== #
+#   ===================================================================================================================#
     def process_conv(self):
         """
         Process the complete conversion
@@ -149,7 +149,7 @@ class CalliStraightConv:
         self.set_unvoiced_f0()
         self.interp_time()
 
-# ==================================================================================================================== #
+#   ===================================================================================================================#
     def plot_f0(self):
         plt.figure()
         plt.plot(self.f0_orig_arr)
