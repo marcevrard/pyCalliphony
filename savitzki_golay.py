@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
 def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     """
     Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
