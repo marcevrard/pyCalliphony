@@ -5,6 +5,7 @@
 #
 
 SAT_DEC="gen/qst001/ver1/SAT+dec_feat3/0"
+#SAT_DEC="qst001/ver1/SAT+dec_feat3/0"
 OUT_PATH="gen/selected"
 
 mkdir -p ${OUT_PATH}
