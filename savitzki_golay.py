@@ -2,6 +2,15 @@
 # -*- coding: utf-8 -*-
 
 
+# In case of python2
+from __future__ import unicode_literals, print_function, absolute_import, division
+try:
+    # noinspection PyUnresolvedReferences
+    from future_builtins import ascii, hex, filter, map, oct, zip
+except ImportError:
+    pass
+
+
 def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     """
     Smooth (and optionally differentiate) data with a Savitzky-Golay filter.

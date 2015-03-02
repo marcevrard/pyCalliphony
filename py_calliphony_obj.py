@@ -31,6 +31,14 @@ VERSION
     $Id$
 """
 
+# In case of python2
+from __future__ import unicode_literals, print_function, absolute_import, division
+try:
+    # noinspection PyUnresolvedReferences
+    from future_builtins import ascii, hex, filter, map, oct, zip
+except ImportError:
+    pass
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt

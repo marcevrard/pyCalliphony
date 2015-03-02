@@ -1,6 +1,8 @@
 #!/bin/bash
 #
 #	Usage:	/Volumes/Python/pyCalliphony/run_straight_gci_extr.sh
+#   for d0 in */; do for d1 in $d0*/; do cd $d1; /Volumes/Python/pyCalliphony/run_straight_gci_extr.sh; cd -; done; done
+#
 #	From:	~/Desktop/Calliphony_SD/matlab/corpus_marc
 #
 
