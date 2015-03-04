@@ -5,9 +5,9 @@
 * Ouvrir les dossiers correspondant aux fichiers à traiter<br>
 (ex. `~/Desktop/__IS2015__/DATA/CDA/colere/limsi_fr_tat_0006`)
 
-* Les 5 premiers dossiers proposent un exemple audio de voix naturelle pour l'inspiration, le nom des fichiers `.wav` correspondants comportent le mot qui définit l'expressivité (ex. `limsi_fr_tat_0006_colere.wav`)
+* Les 5 premiers dossiers proposent un exemple audio de voix naturelle pour l'inspiration, le nom du fichier termine par `_<expressivtié>.wav` (ex. `limsi_fr_tat_0006_colere.wav`)
 
-* Glisser le fichier de synthèse `.wav` (ex. `limsi_fr_tat_0006.wav`) depuis `DATA` vers la fenêtre du patch MaxMSP
+* Glisser le fichier de synthèse `.wav` (ex. `limsi_fr_tat_0006.wav`) depuis le dossier `DATA` vers la fenêtre du patch MaxMSP
 
 * Débuter la performance
 
