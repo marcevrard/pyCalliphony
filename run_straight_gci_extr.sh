@@ -10,7 +10,7 @@
 MATLAB="matlab"
 STRAIGHT="/Volumes/Projet/STRAIGHT/straight-v40-007-d"
 
-THISDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" 	# Get this file path
+#THISDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" 	# Get this file path
 DATA_PATH=$(pwd)
 
 
