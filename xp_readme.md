@@ -11,6 +11,6 @@
 
 * Débuter la performance
 
-* Choisir les deux meilleures prestations:
+* Choisir les deux meilleures prestations :
     * Déplacer les `_new.wav` correspondants dans le dossier parent (ex. `colere`)
     * Passer à la phrase suivante (ex. dossier `limsi_fr_tat_0009`)
