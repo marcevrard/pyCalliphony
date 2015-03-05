@@ -161,7 +161,7 @@ class CalliStraightConv:
     def plot_f0(self):
         plt.figure()
         plt.plot(self.f0_orig_arr)
-        plt.legend(['f0_orig_np'], loc='best')
+        plt.legend(['f0_orig_arr'], loc='best')
 
     def plot_time(self):
         plt.figure()
@@ -188,7 +188,7 @@ class CalliStraightConv:
 
 if __name__ == '__main__':
 
-    FS = 48000
+    FS = 44100
     FRAME_DUR = 0.005
 
     argp = ap.ArgumentParser(description=globals()['__doc__'], formatter_class=ap.RawDescriptionHelpFormatter)
