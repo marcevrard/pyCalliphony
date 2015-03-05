@@ -1,5 +1,7 @@
 * Lire le document de descripton des styles expressifs `ConsignesEnregistrement_Tablette.pdf`
 
+* Ouvrir `Max.app` et changer dans le menu **Options** > **Audio Status** > **Sampling Rate** et choisissez **48000**, fermer `Max.app`
+
 * Ouvrir `BIN/Calliphony_java/Calliphonie.maxpat` avec `Max Runtime.app`
 
 * Ouvrir les dossiers correspondant aux fichiers à traiter<br>
