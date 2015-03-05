@@ -1,6 +1,7 @@
 * Lire le document de descripton des styles expressifs `ConsignesEnregistrement_Tablette.pdf`
 
-* Ouvrir `Max.app` et changer la fréquence d'échantillonage : dans le menu **Options** > **Audio Status** > **Sampling Rate** choisissez **48000** ; fermer `Max.app`
+* Ouvrir `Max.app` et changer la fréquence d'échantillonage :<br>
+dans le menu **Options** > **Audio Status** > **Sampling Rate** choisissez **48000** ; fermer `Max.app`
 
 * Ouvrir `BIN/Calliphony_java/Calliphonie.maxpat` avec `Max Runtime.app`
 
