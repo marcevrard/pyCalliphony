@@ -12,7 +12,8 @@ fermer `Max.app`
 * Les 5 premiers dossiers proposent un exemple audio de voix naturelle pour l'inspiration ;<br>
 le nom du fichier termine par `_<expressivtié>.wav` (ex. `limsi_fr_tat_0006_colere.wav`)
 
-* Glisser le fichier de synthèse `.wav` (ex. `limsi_fr_tat_0006.wav`) depuis le dossier `DATA` vers la fenêtre du patch MaxMSP
+* Glisser le fichier de synthèse `.wav` (ex. `limsi_fr_tat_0006.wav`)<br>
+depuis le dossier `DATA` vers la fenêtre du patch MaxMSP
 
 * Débuter la performance
 
