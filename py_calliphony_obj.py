@@ -188,7 +188,7 @@ class CalliStraightConv:
 
 if __name__ == '__main__':
 
-    FS = 44100
+    FS = 48000
     FRAME_DUR = 0.005
 
     argp = ap.ArgumentParser(description=globals()['__doc__'], formatter_class=ap.RawDescriptionHelpFormatter)
