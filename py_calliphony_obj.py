@@ -20,7 +20,7 @@ EXIT STATUS
 
 AUTHORS
 
-    Marc Evrard             <marc.evrard@limsi.fr>
+    Marc EVRARD             <marc.evrard@limsi.fr>
 
 LICENSE
 
@@ -31,7 +31,7 @@ VERSION
     $Id$
 """
 
-# In case of python2
+# For python2 compatibility
 from __future__ import unicode_literals, print_function, absolute_import, division
 try:
     # noinspection PyUnresolvedReferences
@@ -129,8 +129,8 @@ class CalliStraightConv:
         time_max = self.coord_df['time_smooth'].max()
         pos_max = self.coord_df['pos_smooth'].max()
 
-        target_frame_points_avg = round(self.frame_pts * (time_max/pos_max))
-        imap_idx = np.arange(start=1, stop=num_frames, step=1/target_frame_points_avg)
+        target_frame_pts_avg = round(self.frame_pts * (time_max/pos_max))
+        imap_idx = np.arange(start=1, stop=num_frames, step=1/target_frame_pts_avg)
         imap_time = imap_idx / num_frames * time_max
 
         time_map = np.interp(x=imap_time, xp=self.coord_df['time_smooth'], fp=self.coord_df['pos_smooth'])
@@ -143,19 +143,53 @@ class CalliStraightConv:
         with open(self.fbase_path+'.newpos', 'w') as f_newpos:
             self.imap_arr.astype('float32').tofile(f_newpos)
 
+    def correct_frame_pts(self):
+        """Apply correcting ratio to frame_pts in case of wrong fs used in Max"""
+        self.frame_pts = int(round(self.frame_pts * FS_ERROR_CORR))
+
+    def correct_time_df_pts(self):
+        """Apply correcting ratio to time_df in case of wrong fs used in Max"""
+        self.coord_df['time'] *= FS_ERROR_CORR
+
+    def correct_f0_warp_arr(self):
+        """Apply correcting ratio to f0_df in case of wrong fs used in Max"""
+        self.f0_warp_arr *= FS_ERROR_CORR
+
+    def correct_imap(self):
+        """Apply correcting ratio to imap_arr in case of wrong fs used in Max"""
+        self.imap_arr *= FS_ERROR_CORR**2
+
+    # def process_correct_fs(self):
+    #     """Process multiple correction in case of wrong fs used in Max"""
+    #     self.correct_frame_pts()
+    #     self.correct_time_df_pts()
+    #     self.correct_f0_df()
+    #     self.correct_imap()
+
+
 #   ===================================================================================================================#
     def process_conv(self):
         """
         Process the complete conversion
         """
+        self.correct_frame_pts()        # **IN CASE OF WRONG FS**
+
         self.import_coord_text()
         self.extract_time_position()
         self.import_f0()
         self.extract_time()
+
+        self.correct_time_df_pts()      # **IN CASE OF WRONG FS**
+
         self.smooth_curves()
         self.warp_f0()
+
+        self.correct_f0_warp_arr()     # **IN CASE OF WRONG FS**
+
         self.set_unvoiced_f0()
         self.interp_time()
+
+        self.correct_imap()             # **IN CASE OF WRONG FS**
 
 #   ===================================================================================================================#
     def plot_f0(self):
@@ -190,6 +224,7 @@ if __name__ == '__main__':
 
     FS = 48000
     FRAME_DUR = 0.005
+    FS_ERROR_CORR = 44.1/48     # NOTE: temporary fix, put at 1 to neutralize
 
     argp = ap.ArgumentParser(description=globals()['__doc__'], formatter_class=ap.RawDescriptionHelpFormatter)
     argp.add_argument('-f', '--fpath', required=True, metavar='FILE', help="Coordinate input file name")
