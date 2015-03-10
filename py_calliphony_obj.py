@@ -224,7 +224,8 @@ if __name__ == '__main__':
 
     FS = 48000
     FRAME_DUR = 0.005
-    FS_ERROR_CORR = 44.1/48     # NOTE: temporary fix, put at 1 to neutralize
+    # FS_ERROR_CORR = 44.1/48     # NOTE: temporary fix, put at 1 to neutralize
+    FS_ERROR_CORR = 1
 
     argp = ap.ArgumentParser(description=globals()['__doc__'], formatter_class=ap.RawDescriptionHelpFormatter)
     argp.add_argument('-f', '--fpath', required=True, metavar='FILE', help="Coordinate input file name")
