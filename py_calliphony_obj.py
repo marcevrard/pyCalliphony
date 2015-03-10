@@ -89,7 +89,7 @@ class CalliStraightConv:
 
     def import_f0(self):
         """Import f0 from STRAIGHT"""
-        f0_fpath = os.path.join(self.main_path, '_'.join(self.coord_fname.split('_')[:4]) + '.f0')
+        f0_fpath = os.path.join(self.main_path, '_'.join(self.coord_fname.split('_')[:-2]) + '.f0')
         # noinspection PyNoneFunctionAssignment
         self.f0_orig_arr = np.fromfile(f0_fpath, dtype='f4')
         self.f0_uv_idx = np.where(self.f0_orig_arr == 0)[0]     # Unvoiced indexes
