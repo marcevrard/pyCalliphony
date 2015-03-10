@@ -15,5 +15,5 @@ basename=${fname%_perf_*}    # Trim the shortest match from _perf to the end (ww
 perf_id=${fname#*_perf_}
 
 cd ${STRAIGHT}
-${MATLAB} -nodisplay -nosplash -nojvm -r "RUN_synth_fct ${DATA_PATH}/${basename} _perf_${perf_id}; exit" >/dev/null
+${MATLAB} -nodisplay -nosplash -nojvm -r "RUN_synth_fct ${DATA_PATH}/${basename} _perf_${perf_id}; exit"
 cd - >/dev/null
