@@ -97,8 +97,7 @@ class CalliStraightConv:
     def extract_time(self):
         """Extract relative time from CPU time"""
         coord_time = self.coord_df['cpu_time'] - self.coord_df.iloc[0]['cpu_time']
-        # Insert in df after cpu_time column (and express in s (from ms))
-        self.coord_df.insert(1, 'time', coord_time/1000)
+        self.coord_df.insert(1, 'time', coord_time)  # /1000)  # Insert in df after cpu_time column
 
     def smooth_curves(self):
         """Smooth time and f0 curves"""

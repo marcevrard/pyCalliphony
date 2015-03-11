@@ -8,7 +8,7 @@ for fname in *.wav
 do
     baseperf=${fname%.*}
     basename=${fname%_perf_*}
-#    mv ${basename}/${baseperf}.txt .
+    mv ${basename}/${baseperf}.txt .
     cp ${basename}/${basename}.f0 .
     cp ${basename}/${basename}.sp .
     cp ${basename}/${basename}.ap .
