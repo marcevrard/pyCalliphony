@@ -83,9 +83,19 @@ class CalliStraightConv:
         self.coord_arr = np.genfromtxt(self.coord_fpath).reshape(-1, len(self.headers))
         self.coord_df = pd.DataFrame(self.coord_arr, columns=self.headers)
 
+    def rem_idem_sample_pos_end(self):
+        """Remove records with almost identical values at the end of coord_df.sample_pos"""
+        # Check if there is more than 1 row with values close to the maximum (at the end)
+        idem_interval_bool_df = np.abs(self.coord_df.sample_pos - self.coord_df.sample_pos.max()) < 5
+        if len(self.coord_df[idem_interval_bool_df]) > 1:
+            self.coord_df = self.coord_df[~idem_interval_bool_df]
+
+        # if len(self.coord_df[self.coord_df.sample_pos == self.coord_df.sample_pos.max()]) > 1:
+        #     self.coord_df = self.coord_df[self.coord_df.sample_pos != self.coord_df.sample_pos.max()]
+
     def extract_time_position(self):
         """Get the position of the time pointer from the sample values"""
-        self.coord_df.insert(1, 'position', self.coord_df['sample_pos'] / self.fs)
+        self.coord_df.insert(1, 'position', self.coord_df.sample_pos / self.fs)
 
     def import_f0(self):
         """Import f0 from STRAIGHT"""
@@ -96,21 +106,21 @@ class CalliStraightConv:
 
     def extract_time(self):
         """Extract relative time from CPU time"""
-        coord_time = self.coord_df['cpu_time'] - self.coord_df.iloc[0]['cpu_time']
+        coord_time = self.coord_df.cpu_time - self.coord_df.iloc[0].cpu_time
         self.coord_df.insert(1, 'time', coord_time)  # /1000)  # Insert in df after cpu_time column
 
     def smooth_curves(self):
         """Smooth time and f0 curves"""
-        self.coord_df['time_smooth'] = savitzky_golay(np.array(self.coord_df['time']), window_size=21, order=2)
-        self.coord_df['pos_smooth'] = savitzky_golay(np.array(self.coord_df['position']), window_size=21, order=2)
-        self.coord_df['f0_smooth'] = savitzky_golay(np.array(self.coord_df['f0']), window_size=21, order=2)
+        self.coord_df['time_smooth'] = savitzky_golay(np.array(self.coord_df.time), window_size=21, order=2)
+        self.coord_df['pos_smooth'] = savitzky_golay(np.array(self.coord_df.position), window_size=21, order=2)
+        self.coord_df['f0_smooth'] = savitzky_golay(np.array(self.coord_df.f0), window_size=21, order=2)
 
     def warp_f0(self):
         """Warp f0 values to the original wav file time (from STRAIGHT)"""
-        posit_max = round(self.coord_df['pos_smooth'].iloc[-1] * 2, 2)/2    # get last value and round to 0.005 (0.01/2)
+        posit_max = round(self.coord_df.iloc[-1].pos_smooth * 2, 2)/2    # get last value and round to 0.005 (0.01/2)
         # TODO 0 > self.frame_dur, better solution?
         self.posit_arr = np.arange(start=self.frame_dur, stop=posit_max, step=self.frame_dur)
-        tck = interpolate.splrep(self.coord_df['pos_smooth'], self.coord_df['f0_smooth'], s=5)    # , s=10)
+        tck = interpolate.splrep(self.coord_df.pos_smooth, self.coord_df.f0_smooth, s=5)    # , s=10)
         self.f0_warp_arr = interpolate.splev(self.posit_arr, tck, der=0)
 
     def set_unvoiced_f0(self):
@@ -125,14 +135,14 @@ class CalliStraightConv:
         """
         # noinspection PyTypeChecker
         num_frames = len(self.f0_orig_arr)
-        time_max = self.coord_df['time_smooth'].max()
-        pos_max = self.coord_df['pos_smooth'].max()
+        time_max = self.coord_df.time_smooth.max()
+        pos_max = self.coord_df.pos_smooth.max()
 
         target_frame_pts_avg = round(self.frame_pts * (time_max/pos_max))
         imap_idx = np.arange(start=1, stop=num_frames, step=1/target_frame_pts_avg)
         imap_time = imap_idx / num_frames * time_max
 
-        time_map = np.interp(x=imap_time, xp=self.coord_df['time_smooth'], fp=self.coord_df['pos_smooth'])
+        time_map = np.interp(x=imap_time, xp=self.coord_df.time_smooth, fp=self.coord_df.pos_smooth)
         self.imap_arr = time_map * num_frames / pos_max                 # normalize max value to total number of frames
 
     def write_to_files(self):
@@ -142,13 +152,14 @@ class CalliStraightConv:
         with open(self.fbase_path+'.newpos', 'w') as f_newpos:
             self.imap_arr.astype('float32').tofile(f_newpos)
 
+#   ===================================================================================================================#
     def correct_frame_pts(self):
         """Apply correcting ratio to frame_pts in case of wrong fs used in Max"""
         self.frame_pts = int(round(self.frame_pts * FS_ERROR_CORR))
 
     def correct_time_df_pts(self):
         """Apply correcting ratio to time_df in case of wrong fs used in Max"""
-        self.coord_df['time'] *= FS_ERROR_CORR
+        self.coord_df.time *= FS_ERROR_CORR
 
     def correct_f0_warp_arr(self):
         """Apply correcting ratio to f0_df in case of wrong fs used in Max"""
@@ -174,6 +185,7 @@ class CalliStraightConv:
         self.correct_frame_pts()        # **IN CASE OF WRONG FS**
 
         self.import_coord_text()
+        self.rem_idem_sample_pos_end()
         self.extract_time_position()
         self.import_f0()
         self.extract_time()
@@ -198,18 +210,18 @@ class CalliStraightConv:
 
     def plot_time(self):
         plt.figure()
-        plt.plot(self.coord_df['time'])
-        plt.plot(self.coord_df['position'])
+        plt.plot(self.coord_df.time)
+        plt.plot(self.coord_df.position)
         plt.legend(['time', 'position'], loc='best')
 
     def plot_smoothed_curves(self):
         plt.figure()
-        plt.plot(self.coord_df['time'], self.coord_df['f0'], self.coord_df['time_smooth'], self.coord_df['f0_smooth'])
+        plt.plot(self.coord_df.time, self.coord_df.f0, self.coord_df.time_smooth, self.coord_df.f0_smooth)
         plt.legend(['f0', 'f0_smooth'], loc='best')
 
     def plot_warped_f0(self):
         f, axs = plt.subplots(2, sharey=True)
-        axs[0].plot(self.coord_df['time'], self.coord_df['f0'])
+        axs[0].plot(self.coord_df.time, self.coord_df.f0)
         axs[0].legend(['f0'], loc='best')
         axs[1].plot(self.posit_arr, self.f0_warp_arr)
         axs[1].legend(['f0_warp'], loc='best')
@@ -234,10 +246,14 @@ if __name__ == '__main__':
 
     calli_straight_conv_obj = CalliStraightConv(args.fpath, HEADERS, FS, FRAME_DUR)
 
+    fname = calli_straight_conv_obj.coord_fname
+
     try:
         calli_straight_conv_obj.process_conv()
     except IndexError:
-        print('Import error, the input file is probably empty!')
+        print('Import ERROR, {} is probably empty!'.format(fname))
+    except ValueError:
+        print('ERROR on input data in {}!'.format(fname))
 
     if args.write_to_files is True:
         calli_straight_conv_obj.write_to_files()

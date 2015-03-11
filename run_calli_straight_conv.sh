@@ -3,6 +3,7 @@
 #	Usage:	/Volumes/Python/pyCalliphony/run_calli_straight_conv.sh
 #	From:	~/Desktop/Calliphony_SD/matlab/corpus_marc
 #
+#   for d in */; do cd ${d}; /Volumes/Python/pyCalliphony/run_calli_straight_conv.sh; echo "${d} done."; cd -; done
 
 #MATLAB=/Applications/MATLAB_R2012a.app/bin/matlab
 MATLAB="matlab"
