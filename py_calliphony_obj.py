@@ -48,7 +48,8 @@ from savitzki_golay import savitzky_golay
 import os.path
 
 
-HEADERS = ('cpu_time', 'sample_pos', 'f0')
+# FS_ERROR_CORR = 44.1/48     # NOTE: temporary fix, put at 1 to neutralize
+FS_ERROR_CORR = 1
 
 
 class CalliStraightConv:
@@ -233,10 +234,9 @@ class CalliStraightConv:
 
 if __name__ == '__main__':
 
+    HEADERS = ('cpu_time', 'sample_pos', 'f0')
     FS = 48000
     FRAME_DUR = 0.005
-    # FS_ERROR_CORR = 44.1/48     # NOTE: temporary fix, put at 1 to neutralize
-    FS_ERROR_CORR = 1
 
     argp = ap.ArgumentParser(description=globals()['__doc__'], formatter_class=ap.RawDescriptionHelpFormatter)
     argp.add_argument('-f', '--fpath', required=True, metavar='FILE', help="Coordinate input file name")
@@ -247,13 +247,12 @@ if __name__ == '__main__':
     calli_straight_conv_obj = CalliStraightConv(args.fpath, HEADERS, FS, FRAME_DUR)
 
     fname = calli_straight_conv_obj.coord_fname
-
     try:
         calli_straight_conv_obj.process_conv()
     except IndexError:
-        print('Import ERROR, {} is probably empty!'.format(fname))
+        print("Import ERROR, {} is probably empty!".format(fname))
     except ValueError:
-        print('ERROR on input data in {}!'.format(fname))
+        print("ERROR on input data in {}!".format(fname))
 
     if args.write_to_files is True:
         calli_straight_conv_obj.write_to_files()
