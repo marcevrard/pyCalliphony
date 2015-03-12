@@ -135,9 +135,9 @@ class CalliStraightConv:
         (imap = 1 : 1/(self.frame_pts) : num_frames;)
         """
         # noinspection PyTypeChecker
-        num_frames = len(self.f0_orig_arr)
         time_max = self.coord_df.time_smooth.max()
         pos_max = self.coord_df.pos_smooth.max()
+        num_frames = round(pos_max / FRAME_DUR)
 
         target_frame_pts_avg = round(self.frame_pts * (time_max/pos_max))
         imap_idx = np.arange(start=1, stop=num_frames, step=1/target_frame_pts_avg)
