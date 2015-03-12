@@ -153,7 +153,7 @@ class CalliStraightConv:
         with open(self.fbase_path+'.newpos', 'w') as f_newpos:
             self.imap_arr.astype('float32').tofile(f_newpos)
 
-#   ===================================================================================================================#
+    #   ===============================================================================================================#
     def correct_frame_pts(self):
         """Apply correcting ratio to frame_pts in case of wrong fs used in Max"""
         self.frame_pts = int(round(self.frame_pts * FS_ERROR_CORR))
@@ -170,14 +170,7 @@ class CalliStraightConv:
         """Apply correcting ratio to imap_arr in case of wrong fs used in Max"""
         self.imap_arr *= FS_ERROR_CORR**2
 
-    # def process_correct_fs(self):
-    #     """Process multiple correction in case of wrong fs used in Max"""
-    #     self.correct_frame_pts()
-    #     self.correct_time_df_pts()
-    #     self.correct_f0_df()
-    #     self.correct_imap()
-
-#   ===================================================================================================================#
+    #   ===============================================================================================================#
     def process_conv(self):
         """
         Process the complete conversion
@@ -202,7 +195,7 @@ class CalliStraightConv:
 
         self.correct_imap()             # **IN CASE OF WRONG FS**
 
-#   ===================================================================================================================#
+    #   ===============================================================================================================#
     def plot_f0(self):
         plt.figure()
         plt.plot(self.f0_orig_arr)
