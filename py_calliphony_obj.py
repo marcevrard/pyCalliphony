@@ -177,7 +177,6 @@ class CalliStraightConv:
     #     self.correct_f0_df()
     #     self.correct_imap()
 
-
 #   ===================================================================================================================#
     def process_conv(self):
         """
@@ -231,6 +230,7 @@ class CalliStraightConv:
         plt.figure()
         plt.plot(self.imap_arr)
         plt.legend(['imap'], loc='best')
+
 
 if __name__ == '__main__':
 
