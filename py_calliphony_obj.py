@@ -48,10 +48,6 @@ from savitzki_golay import savitzky_golay
 import os.path
 
 
-# FS_ERROR_CORR = 44.1/48     # NOTE: temporary fix, put at 1 to neutralize
-FS_ERROR_CORR = 1
-
-
 class CalliStraightConv:
     """
     Class to convert calliphony tablet coordinates to straight
@@ -108,7 +104,7 @@ class CalliStraightConv:
     def extract_time(self):
         """Extract relative time from CPU time"""
         coord_time = self.coord_df.cpu_time - self.coord_df.iloc[0].cpu_time
-        self.coord_df.insert(1, 'time', coord_time)  # /1000)  # Insert in df after cpu_time column
+        self.coord_df.insert(1, 'time', coord_time)  # / 1000)  # Insert in df after cpu_time column
 
     def smooth_curves(self):
         """Smooth time and f0 curves"""
@@ -156,7 +152,7 @@ class CalliStraightConv:
     #   ===============================================================================================================#
     def correct_f0_warp_arr(self):
         """Apply correcting ratio to f0_df in case of wrong fs used in Max"""
-        self.f0_warp_arr *= FS_ERROR_CORR
+        self.f0_warp_arr *= 44.1/48
 
     #   ===============================================================================================================#
     def process_conv(self):
@@ -170,7 +166,7 @@ class CalliStraightConv:
         self.extract_time()
         self.smooth_curves()
         self.warp_f0()
-        self.correct_f0_warp_arr()     # **IN CASE OF WRONG FS**
+        # self.correct_f0_warp_arr()     # **IN CASE OF WRONG FS**
         self.set_unvoiced_f0()
         self.interp_time()
 
