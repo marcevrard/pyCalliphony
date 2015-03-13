@@ -154,46 +154,25 @@ class CalliStraightConv:
             self.imap_arr.astype('float32').tofile(f_newpos)
 
     #   ===============================================================================================================#
-    def correct_frame_pts(self):
-        """Apply correcting ratio to frame_pts in case of wrong fs used in Max"""
-        self.frame_pts = int(round(self.frame_pts * FS_ERROR_CORR))
-
-    def correct_time_df_pts(self):
-        """Apply correcting ratio to time_df in case of wrong fs used in Max"""
-        self.coord_df.time *= FS_ERROR_CORR
-
     def correct_f0_warp_arr(self):
         """Apply correcting ratio to f0_df in case of wrong fs used in Max"""
         self.f0_warp_arr *= FS_ERROR_CORR
-
-    def correct_imap(self):
-        """Apply correcting ratio to imap_arr in case of wrong fs used in Max"""
-        self.imap_arr *= FS_ERROR_CORR**2
 
     #   ===============================================================================================================#
     def process_conv(self):
         """
         Process the complete conversion
         """
-        self.correct_frame_pts()        # **IN CASE OF WRONG FS**
-
         self.import_coord_text()
         self.rem_idem_sample_pos_end()
         self.extract_time_position()
         self.import_f0()
         self.extract_time()
-
-        self.correct_time_df_pts()      # **IN CASE OF WRONG FS**
-
         self.smooth_curves()
         self.warp_f0()
-
         self.correct_f0_warp_arr()     # **IN CASE OF WRONG FS**
-
         self.set_unvoiced_f0()
         self.interp_time()
-
-        self.correct_imap()             # **IN CASE OF WRONG FS**
 
     #   ===============================================================================================================#
     def plot_f0(self):
